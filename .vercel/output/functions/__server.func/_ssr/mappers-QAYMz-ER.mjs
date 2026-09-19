@@ -1,0 +1,83 @@
+//#region node_modules/.nitro/vite/services/ssr/assets/mappers-QAYMz-ER.js
+function mapSettings(row) {
+	return {
+		id: Number(row.id),
+		siteTitle: String(row.site_title ?? ""),
+		description: String(row.description ?? ""),
+		email: String(row.email ?? ""),
+		phone: row.phone ?? null,
+		address: String(row.address ?? ""),
+		instagramUrl: row.instagram_url ?? null,
+		eitaaUrl: row.eitaa_url ?? null,
+		telegramUrl: row.telegram_url ?? null,
+		tallySuggestionsUrl: row.tally_suggestions_url ?? null,
+		logoMediaId: row.logo_media_id == null ? null : Number(row.logo_media_id),
+		mapEmbedUrl: row.map_embed_url ?? null
+	};
+}
+function mapNews(row) {
+	return {
+		id: Number(row.id),
+		title: String(row.title),
+		slug: String(row.slug),
+		summary: String(row.summary ?? ""),
+		content: String(row.content ?? ""),
+		coverMediaId: row.cover_media_id == null ? null : Number(row.cover_media_id),
+		publishedAt: row.published_at ?? null,
+		status: row.status ?? "draft",
+		createdAt: String(row.created_at ?? ""),
+		updatedAt: String(row.updated_at ?? "")
+	};
+}
+function mapPlayer(row) {
+	return {
+		id: Number(row.id),
+		firstName: String(row.first_name),
+		lastName: String(row.last_name),
+		slug: String(row.slug),
+		photoMediaId: row.photo_media_id == null ? null : Number(row.photo_media_id),
+		fideId: row.fide_id ?? null,
+		bio: String(row.bio ?? "")
+	};
+}
+function mapTournament(row) {
+	return {
+		id: Number(row.id),
+		title: String(row.title),
+		slug: String(row.slug),
+		description: String(row.description ?? ""),
+		coverMediaId: row.cover_media_id == null ? null : Number(row.cover_media_id),
+		startDate: row.start_date ?? null,
+		endDate: row.end_date ?? null,
+		location: row.location ?? null,
+		status: row.status ?? "upcoming",
+		tallyUrl: row.tally_url ?? null,
+		chessResultsUrl: row.chess_results_url ?? null,
+		rulesMediaId: row.rules_media_id == null ? null : Number(row.rules_media_id),
+		galleryId: row.gallery_id == null ? null : Number(row.gallery_id),
+		sortOrder: Number(row.sort_order ?? 0)
+	};
+}
+function mapAlbum(row) {
+	return {
+		id: Number(row.id),
+		title: String(row.title),
+		slug: String(row.slug),
+		description: String(row.description ?? ""),
+		coverMediaId: row.cover_media_id == null ? null : Number(row.cover_media_id),
+		albumDate: row.album_date ?? null,
+		imageCount: row.image_count == null ? void 0 : Number(row.image_count)
+	};
+}
+function mapMedia(row) {
+	return {
+		id: Number(row.id),
+		filename: String(row.filename),
+		mimeType: String(row.mime_type),
+		kind: row.kind === "pdf" ? "pdf" : "image",
+		sizeBytes: Number(row.size_bytes ?? 0),
+		createdAt: String(row.created_at ?? "")
+	};
+}
+//#endregion
+export { mapSettings as a, mapPlayer as i, mapMedia as n, mapTournament as o, mapNews as r, mapAlbum as t };

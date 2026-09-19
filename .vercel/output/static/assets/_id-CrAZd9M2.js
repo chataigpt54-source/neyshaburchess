@@ -1,0 +1,1 @@
+import{C as e}from"./middleware-BIZfRxU8.js";import{t}from"./index-Bg96f0cK.js";import{t as n}from"./tournament-editor-bemV07tX.js";var r=e();function i(){return(0,r.jsx)(n,{initial:t.useLoaderData()})}export{i as component};

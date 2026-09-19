@@ -1,0 +1,1 @@
+import{C as e}from"./middleware-BIZfRxU8.js";import{t}from"./tournament-editor-bemV07tX.js";var n=e(),r=()=>(0,n.jsx)(t,{});export{r as component};

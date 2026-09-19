@@ -1,0 +1,155 @@
+import { r as createServerFn } from "./ssr.mjs";
+import { t as createServerRpc } from "./createServerRpc-CcvdN_gc.mjs";
+import { r as getSql } from "./db-B81SbFjo.mjs";
+import { t as authMiddleware } from "./middleware-BO4Pigeq.mjs";
+import { i as memberRegisterSchema } from "./validation-BS2fXfa3.mjs";
+import { t as isAdminUser } from "./require-admin.server-oqCxN8r_.mjs";
+import { ensureAdminSeed, getAdminLoginEmail, getAdminLoginUsername } from "./seed-admin.server-DS1zKlLD.mjs";
+//#region node_modules/.nitro/vite/services/ssr/assets/members-XeVoTi4B.js
+var WINDOW_MS = 9e5;
+var MAX_ATTEMPTS = 8;
+var buckets = /* @__PURE__ */ new Map();
+var RateLimitError = class extends Error {
+	status = 429;
+	constructor(message = "تعداد تلاش‌های ورود بیش از حد مجاز است. کمی بعد دوباره تلاش کنید.") {
+		super(message);
+		this.name = "RateLimitError";
+	}
+};
+function assertLoginRateLimit(key) {
+	const now = Date.now();
+	const current = buckets.get(key);
+	if (!current || now > current.resetAt) {
+		buckets.set(key, {
+			count: 1,
+			resetAt: now + WINDOW_MS
+		});
+		return;
+	}
+	if (current.count >= MAX_ATTEMPTS) throw new RateLimitError();
+	current.count += 1;
+}
+function resetLoginRateLimit(key) {
+	buckets.delete(key);
+}
+var completeMemberProfile_createServerFn_handler = createServerRpc({
+	id: "5dd0ba5c84cddbd6013004a76599be2c53118b5b38f84196a6aab2a1f76e6cc6",
+	name: "completeMemberProfile",
+	filename: "src/lib/data/members.ts"
+}, (opts) => completeMemberProfile.__executeServer(opts));
+var completeMemberProfile = createServerFn({ method: "POST" }).middleware([authMiddleware]).validator((input) => memberRegisterSchema.pick({
+	firstName: true,
+	lastName: true,
+	phone: true,
+	fideId: true
+}).parse(input)).handler(completeMemberProfile_createServerFn_handler, async ({ context, data }) => {
+	await (await getSql())`
+      insert into profiles (user_id, first_name, last_name, phone, fide_id, role)
+      values (
+        ${context.userId},
+        ${data.firstName},
+        ${data.lastName},
+        ${data.phone},
+        ${data.fideId?.trim() || null},
+        'member'
+      )
+      on conflict (user_id) do update set
+        first_name = excluded.first_name,
+        last_name = excluded.last_name,
+        phone = excluded.phone,
+        fide_id = excluded.fide_id,
+        updated_at = now()
+    `;
+	return { ok: true };
+});
+var getMyProfile_createServerFn_handler = createServerRpc({
+	id: "ea64dcda73aa0596160a95a6de152c9d81118161cc1f67df4353222d4185230d",
+	name: "getMyProfile",
+	filename: "src/lib/data/members.ts"
+}, (opts) => getMyProfile.__executeServer(opts));
+var getMyProfile = createServerFn({ method: "GET" }).middleware([authMiddleware]).handler(getMyProfile_createServerFn_handler, async ({ context }) => {
+	const sql = await getSql();
+	const row = (await sql`select * from profiles where user_id = ${context.userId} limit 1`)[0];
+	if (!row) {
+		const { getSessionUser } = await import("./verify.server-BczJSy53.mjs").then((n) => n.n).then((n) => n.n);
+		const u = await getSessionUser();
+		await sql`
+        insert into profiles (user_id, first_name, last_name, role)
+        values (${context.userId}, ${""}, ${""}, 'member')
+        on conflict (user_id) do nothing
+      `;
+		return {
+			userId: context.userId,
+			firstName: "",
+			lastName: "",
+			phone: null,
+			fideId: null,
+			role: "member",
+			email: u?.email ?? null
+		};
+	}
+	const { getSessionUser } = await import("./verify.server-BczJSy53.mjs").then((n) => n.n).then((n) => n.n);
+	const u = await getSessionUser();
+	return {
+		userId: row.user_id,
+		firstName: row.first_name,
+		lastName: row.last_name,
+		phone: row.phone,
+		fideId: row.fide_id,
+		role: row.role,
+		email: u?.email ?? null
+	};
+});
+var checkIsAdmin_createServerFn_handler = createServerRpc({
+	id: "b6b38e9ee8c2f4f628b35d0331cdad5550a96c4057a949439be269798bb9d49c",
+	name: "checkIsAdmin",
+	filename: "src/lib/data/members.ts"
+}, (opts) => checkIsAdmin.__executeServer(opts));
+var checkIsAdmin = createServerFn({ method: "GET" }).middleware([authMiddleware]).handler(checkIsAdmin_createServerFn_handler, async ({ context }) => {
+	await ensureAdminSeed();
+	return { admin: await isAdminUser(context.userId) };
+});
+var prepareAdminLogin_createServerFn_handler = createServerRpc({
+	id: "fac33be751c9374daad5ae5430b026017718248ca2304a64fcfbe0566ef2c03c",
+	name: "prepareAdminLogin",
+	filename: "src/lib/data/members.ts"
+}, (opts) => prepareAdminLogin.__executeServer(opts));
+var prepareAdminLogin = createServerFn({ method: "POST" }).validator((input) => input).handler(prepareAdminLogin_createServerFn_handler, async ({ data }) => {
+	await ensureAdminSeed();
+	const username = data.username.trim();
+	assertLoginRateLimit(`admin:${username.toLowerCase()}`);
+	const expected = getAdminLoginUsername();
+	if (username.toLowerCase() !== expected.toLowerCase() && username.toLowerCase() !== getAdminLoginEmail().toLowerCase()) throw new Error("نام کاربری یا رمز عبور صحیح نیست.");
+	return { email: getAdminLoginEmail() };
+});
+var noteAdminLoginResult_createServerFn_handler = createServerRpc({
+	id: "cb42f757bf26f484868a7aab17250eb628add4667fff7bba91956ae46bb8efdf",
+	name: "noteAdminLoginResult",
+	filename: "src/lib/data/members.ts"
+}, (opts) => noteAdminLoginResult.__executeServer(opts));
+var noteAdminLoginResult = createServerFn({ method: "POST" }).validator((input) => input).handler(noteAdminLoginResult_createServerFn_handler, async ({ data }) => {
+	const key = `admin:${data.username.trim().toLowerCase()}`;
+	if (data.ok) resetLoginRateLimit(key);
+	return { ok: true };
+});
+var prepareMemberLogin_createServerFn_handler = createServerRpc({
+	id: "5aa2be124be8aac18c8a10a4c676582799238ec5be7f9676a520bde59940c406",
+	name: "prepareMemberLogin",
+	filename: "src/lib/data/members.ts"
+}, (opts) => prepareMemberLogin.__executeServer(opts));
+var prepareMemberLogin = createServerFn({ method: "POST" }).validator((input) => input).handler(prepareMemberLogin_createServerFn_handler, async ({ data }) => {
+	assertLoginRateLimit(`member:${data.email.trim().toLowerCase()}`);
+	return { ok: true };
+});
+var noteMemberLoginResult_createServerFn_handler = createServerRpc({
+	id: "50c51f4f87dd2a83e21b51e68b96e25bf6568c3dcb8d9d08766d30e3833f0aab",
+	name: "noteMemberLoginResult",
+	filename: "src/lib/data/members.ts"
+}, (opts) => noteMemberLoginResult.__executeServer(opts));
+var noteMemberLoginResult = createServerFn({ method: "POST" }).validator((input) => input).handler(noteMemberLoginResult_createServerFn_handler, async ({ data }) => {
+	const key = `member:${data.email.trim().toLowerCase()}`;
+	if (data.ok) resetLoginRateLimit(key);
+	return { ok: true };
+});
+//#endregion
+export { checkIsAdmin_createServerFn_handler, completeMemberProfile_createServerFn_handler, getMyProfile_createServerFn_handler, noteAdminLoginResult_createServerFn_handler, noteMemberLoginResult_createServerFn_handler, prepareAdminLogin_createServerFn_handler, prepareMemberLogin_createServerFn_handler };

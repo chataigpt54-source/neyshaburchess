@@ -1,0 +1,1 @@
+import{C as e}from"./middleware-BIZfRxU8.js";import{r as t}from"./index-Bg96f0cK.js";import{t as n}from"./player-editor-BBasFvcX.js";var r=e(),i=()=>(0,r.jsx)(n,{initial:t.useLoaderData()});export{i as component};
